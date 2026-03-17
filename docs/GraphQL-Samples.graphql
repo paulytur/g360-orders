@@ -1,0 +1,365 @@
+# G360 Orders – GraphQL sample queries and mutations
+# Set header: X-User-Id = your-user-id (required for all requests except introspection)
+
+# ========== QUERIES ==========
+
+# --- Orders ---
+query GetOrders {
+  getOrders(pageNumber: 1, pageSize: 10, includeDeleted: false) {
+    success
+    messages
+    page
+    pageSize
+    totalCount
+    data {
+      id
+      isDeleted
+      createdBy
+      createdDatetime
+      updatedBy
+      updatedDatetime
+      orderDetails {
+        id
+        orderId
+        pizzaId
+        quantity
+      }
+    }
+  }
+}
+
+query GetOrderById {
+  getOrderById(id: 1) {
+    success
+    messages
+    data {
+      id
+      orderDetails { id pizzaId quantity }
+    }
+  }
+}
+
+# --- Insights (counts, revenue, trends, peak hours, top-selling pizza) ---
+query GetInsights {
+  # Optional: omit startDate/endDate to use last 30 days to now
+  getInsights(
+    startDate: "2025-02-01T00:00:00Z"
+    endDate: "2025-03-14T23:59:59Z"
+  ) {
+    success
+    messages
+    data {
+      totalOrders
+      totalRevenue
+      totalPizzasSold
+      averageOrderValue
+      entityCounts {
+        orders
+        pizzas
+        pizzaTypes
+        ingredients
+        categories
+      }
+      revenueOverview {
+        totalRevenue
+        periodRevenue
+        startDate
+        endDate
+      }
+      topSellingPizza {
+        pizzaId
+        pizzaCode
+        pizzaType
+        pizzaSize
+        unitPrice
+        totalQuantitySold
+        revenue
+      }
+      dailySalesTrend {
+        date
+        orderCount
+        revenue
+      }
+      peakHours {
+        hour
+        orderCount
+        revenue
+      }
+      salesByCategory {
+        categoryName
+        orderCount
+        quantitySold
+        revenue
+      }
+      weeklyAnalysis {
+        weekStart
+        orderCount
+        revenue
+      }
+    }
+  }
+}
+
+# --- Ingredients ---
+query GetIngredients {
+  getIngredients(description: null, pageNumber: 1, pageSize: 10, includeDeleted: false) {
+    success
+    messages
+    page
+    pageSize
+    totalCount
+    data {
+      id
+      description
+      isDeleted
+      createdBy
+      createdDatetime
+    }
+  }
+}
+
+query GetIngredientById {
+  getIngredientById(id: 1) {
+    success
+    messages
+    data { id description }
+  }
+}
+
+# --- Categories ---
+query GetCategories {
+  getCategories(name: null, pageNumber: 1, pageSize: 10, includeDeleted: false) {
+    success
+    messages
+    page
+    pageSize
+    totalCount
+    data {
+      id
+      name
+      isDeleted
+      createdBy
+      createdDatetime
+    }
+  }
+}
+
+query GetCategoryById {
+  getCategoryById(id: 1) {
+    success
+    messages
+    data { id name }
+  }
+}
+
+# --- Pizzas ---
+query GetPizzas {
+  getPizzas(code: null, type: null, size: null, pageNumber: 1, pageSize: 10, includeDeleted: false) {
+    success
+    messages
+    page
+    pageSize
+    totalCount
+    data {
+      id
+      code
+      type
+      size
+      price
+      isDeleted
+      createdBy
+      createdDatetime
+    }
+  }
+}
+
+query GetPizzaById {
+  getPizzaById(id: 1) {
+    success
+    messages
+    data { id code type size price }
+  }
+}
+
+# --- Pizza Types ---
+query GetPizzaTypes {
+  getPizzaTypes(code: null, categoryId: null, pageNumber: 1, pageSize: 10, includeDeleted: false) {
+    success
+    messages
+    page
+    pageSize
+    totalCount
+    data {
+      id
+      code
+      name
+      categoryId
+      isDeleted
+      createdBy
+      createdDatetime
+      category { id name }
+      pizzaDetails { id ingredientId ingredient { id description } }
+    }
+  }
+}
+
+query GetPizzaTypeById {
+  getPizzaTypeById(id: 1) {
+    success
+    messages
+    data { id code name categoryId category { name } }
+  }
+}
+
+
+# ========== MUTATIONS ==========
+
+# --- Orders ---
+mutation CreateOrder {
+  createOrder(input: {
+    items: [
+      { pizzaId: 1, quantity: 2 }
+      { pizzaId: 2, quantity: 1 }
+    ]
+  }) {
+    success
+    messages
+    data { id orderDetails { pizzaId quantity } }
+  }
+}
+
+mutation UpdateOrder {
+  updateOrder(id: 1, input: {
+    items: [
+      { pizzaId: 1, quantity: 3 }
+      { pizzaId: 2, quantity: 2 }
+    ]
+  }) {
+    success
+    messages
+    data { id orderDetails { pizzaId quantity } }
+  }
+}
+
+mutation DeleteOrder {
+  deleteOrder(id: 1) {
+    success
+    messages
+  }
+}
+
+# --- Ingredients ---
+mutation CreateIngredient {
+  createIngredient(input: { description: "Mozzarella cheese" }) {
+    success
+    messages
+    data { id description }
+  }
+}
+
+mutation UpdateIngredient {
+  updateIngredient(id: 1, input: { description: "Fresh mozzarella" }) {
+    success
+    messages
+    data { id description }
+  }
+}
+
+mutation DeleteIngredient {
+  deleteIngredient(id: 1) {
+    success
+    messages
+  }
+}
+
+# --- Categories ---
+mutation CreateCategory {
+  createCategory(input: { name: "Classic Pizzas" }) {
+    success
+    messages
+    data { id name }
+  }
+}
+
+mutation UpdateCategory {
+  updateCategory(id: 1, input: { name: "Classic & Signature" }) {
+    success
+    messages
+    data { id name }
+  }
+}
+
+mutation DeleteCategory {
+  deleteCategory(id: 1) {
+    success
+    messages
+  }
+}
+
+# --- Pizzas ---
+mutation CreatePizza {
+  createPizza(input: {
+    code: "MARG-M"
+    type: "Margherita"
+    size: "Medium"
+    price: 12.99
+  }) {
+    success
+    messages
+    data { id code type size price }
+  }
+}
+
+mutation UpdatePizza {
+  updatePizza(id: 1, input: {
+    code: "MARG-M"
+    type: "Margherita"
+    size: "Medium"
+    price: 13.49
+  }) {
+    success
+    messages
+    data { id code price }
+  }
+}
+
+mutation DeletePizza {
+  deletePizza(id: 1) {
+    success
+    messages
+  }
+}
+
+# --- Pizza Types ---
+mutation CreatePizzaType {
+  createPizzaType(input: {
+    code: "MARG"
+    name: "Margherita"
+    categoryId: 1
+    ingredientIds: [1, 2, 3]
+  }) {
+    success
+    messages
+    data { id code name categoryId }
+  }
+}
+
+mutation UpdatePizzaType {
+  updatePizzaType(id: 1, input: {
+    code: "MARG"
+    name: "Margherita Classic"
+    categoryId: 1
+    ingredientIds: [1, 2, 3, 4]
+  }) {
+    success
+    messages
+    data { id code name }
+  }
+}
+
+mutation DeletePizzaType {
+  deletePizzaType(id: 1) {
+    success
+    messages
+  }
+}

@@ -1,0 +1,29 @@
+.vs/
+.vscode/
+
+# Rider / IntelliJ
+.idea/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+# Build outputs
+**/bin/
+**/obj/
+
+# Logs
+*.log
+
+# SQLite DB files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+
+# OS junk
+Thumbs.db
+.DS_Store
