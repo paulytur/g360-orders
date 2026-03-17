@@ -12,6 +12,9 @@ public class CsvDataImportService : IDataImportService
 {
     private const string AuditUser = "import";
     private static readonly DateTime AuditNow = DateTime.UtcNow;
+    private const int PizzaDetailsBatchSize = 5000;
+    private const int OrderSaveEvery = 1000;
+    private const int OrderDetailsBatchSize = 1000;
 
     private readonly OrdersDbContext _db;
 
@@ -172,7 +175,7 @@ public class CsvDataImportService : IDataImportService
                 .Select(d => new ValueTuple<long, long>(d.PizzaTypeId, d.IngredientId))
                 .ToHashSetAsync(cancellationToken);
             
-            var detailsBatch = new List<PizzaDetail>(5000);
+            var detailsBatch = new List<PizzaDetail>(PizzaDetailsBatchSize);
             
             foreach (var row in pizzaTypeRows)
             {
@@ -201,7 +204,7 @@ public class CsvDataImportService : IDataImportService
                         UpdatedDatetime = AuditNow
                     });
                     
-                    if (detailsBatch.Count >= 5000)
+                    if (detailsBatch.Count >= PizzaDetailsBatchSize)
                     {
                         _db.PizzaDetails.AddRange(detailsBatch);
                         await _db.SaveChangesAsync(cancellationToken);
@@ -301,7 +304,7 @@ public class CsvDataImportService : IDataImportService
                     };
                     _db.Orders.Add(order);
                     result.OrdersCreated++;
-                    if (result.OrdersCreated % 1000 == 0)
+                    if (result.OrdersCreated % OrderSaveEvery == 0)
                         await _db.SaveChangesAsync(cancellationToken);
                 }
             }
@@ -315,7 +318,7 @@ public class CsvDataImportService : IDataImportService
                 return result;
             }
 
-            var odBatch = new List<OrderDetail>(1000);
+            var odBatch = new List<OrderDetail>(OrderDetailsBatchSize);
             using (var reader = new StreamReader(orderDetailsPath))
             using (var csv = new CsvReader(reader, csvConfig))
             {
@@ -340,7 +343,7 @@ public class CsvDataImportService : IDataImportService
                         UpdatedDatetime = AuditNow
                     });
                     result.OrderDetailsCreated++;
-                    if (odBatch.Count >= 1000)
+                    if (odBatch.Count >= OrderDetailsBatchSize)
                     {
                         _db.OrderDetails.AddRange(odBatch);
                         await _db.SaveChangesAsync(cancellationToken);
