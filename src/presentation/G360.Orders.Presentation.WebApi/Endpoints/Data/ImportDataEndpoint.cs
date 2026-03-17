@@ -17,7 +17,7 @@ public class ImportDataEndpoint(IDataImportService importService, IWebHostEnviro
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        // Use config "DataImport:Folder" if set, else default docs/Data relative to repo root
+        // Use config "DataImport:Folder" if set, else default docs/Data relative to repo root.
         var configuredPath = config["DataImport:Folder"];
         var dataPath = string.IsNullOrWhiteSpace(configuredPath)
             ? System.IO.Path.GetFullPath(System.IO.Path.Combine(env.ContentRootPath, "..", "..", "..", "docs", "Data"))

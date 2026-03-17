@@ -50,6 +50,7 @@ builder.Services.AddScoped<IPizzaDetailRepository, PizzaDetailRepository>();
 builder.Services.AddScoped<IRepository<Ingredient>, IngredientRepository>();
 builder.Services.AddScoped<IRepository<Category>, CategoryRepository>();
 builder.Services.AddScoped<IInsightsRepository, InsightsRepository>();
+// CSV importer: POST /api/data/import (defaults to docs/Data; override with DataImport:Folder)
 builder.Services.AddScoped<IDataImportService, CsvDataImportService>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(G360.Orders.Application.Queries.GetOrdersQuery).Assembly));

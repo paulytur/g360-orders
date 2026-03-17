@@ -8,6 +8,7 @@ public interface IDataImportService
     /// <summary>
     /// Imports all CSV files from the given folder (pizza_types.csv, pizzas.csv, orders.csv, order_details.csv)
     /// into the database in the correct order. Returns counts per entity type.
+    /// The importer is designed for large datasets (tens of thousands of rows).
     /// </summary>
     Task<DataImportResult> ImportFromFolderAsync(string dataFolderPath, CancellationToken cancellationToken = default);
 }
